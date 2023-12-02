@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Enkripsi dan Dekripsi AES</title>
+</head>
+<body>
+    <h2>Enkripsi dan Dekripsi AES</h2>
+    
+    <label for="kunci">Masukkan kunci (panjang harus 32 karakter):</label>
+    <input type="text" id="kunci" /><br>
+    
+    <label for="teksAsli">Masukkan teks yang akan dienkripsi:</label>
+    <input type="text" id="teksAsli" /><br>
+    
+    <button onclick="enkripsiDanDekripsiAES()">Enkripsi dan Dekripsi</button><br>
+    
+    <div id="hasilEnkripsi"></div>
+</body>
+<script>
+// Fungsi untuk mengenkripsi teks menggunakan AES
+function enkripsiAES(teks, kunci) {
+    const iv = crypto.getRandomValues(new Uint8Array(16)); // Vektor inisialisasi acak
+    const teksArray = new TextEncoder().encode(teks);
+    const kunciArray = new TextEncoder().encode(kunci);
+
+    const cipher = new TextEncoder().encode('aes-256-cbc');
+
+    const teksTerenkripsi = window.crypto.subtle.encrypt({ name: 'AES-CBC', iv }, kunciArray, teksArray);
+
+    return { iv, teksTerenkripsi };
+}
+
+// Fungsi untuk mendekripsi teks yang telah dienkripsi dengan AES
+async function dekripsiAES(teksTerenkripsi, kunci, iv) {
+    const kunciArray = new TextEncoder().encode(kunci);
+
+    const dekripsi = await window.crypto.subtle.decrypt({ name: 'AES-CBC', iv }, kunciArray, teksTerenkripsi);
+
+    const dekripsiTeksArray = new Uint8Array(dekripsi);
+    const dekripsiTeks = new TextDecoder().decode(dekripsiTeksArray);
+
+    return dekripsiTeks;
+}
+
+function enkripsiDanDekripsiAES() {
+    const kunci = document.getElementById("kunci").value;
+    const teksAsli = document.getElementById("teksAsli").value;
+
+    // Enkripsi teks
+    const hasilEnkripsi = enkripsiAES(teksAsli, kunci);
+
+    // Mendekripsi teks
+    dekripsiAES(hasilEnkripsi.teksTerenkripsi, kunci, hasilEnkripsi.iv)
+        .then(teksTerdekripsi => {
+            const hasilEnkripsiDiv = document.getElementById("hasilEnkripsi");
+            hasilEnkripsiDiv.innerHTML = "Teks Terenkripsi: " + btoa(String.fromCharCode.apply(null, new Uint8Array(hasilEnkripsi.teksTerenkripsi))) + "<br>IV: " + btoa(String.fromCharCode.apply(null, new Uint8Array(hasilEnkripsi.iv))) + "<br>Teks Terdekripsi: " + teksTerdekripsi;
+        })
+        .catch(error => {
+            console.error(error);
+        });
+}
+</script>
+</html>
