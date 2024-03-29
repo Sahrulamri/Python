@@ -1,2 +1,2 @@
 # Python
-Sedikit mengenai Dasar Bahasa Pemprograman Python yang akan terus diupdate
+Sedikit mengenai Dasar Bahasa Pemprograman Python yang sudah selesai progressnya
